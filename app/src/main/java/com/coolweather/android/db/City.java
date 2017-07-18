@@ -25,6 +25,10 @@ public class City extends DataSupport {
         return cityCode;
     }
 
+    public String getCityName(){
+        return cityName;
+    }
+
     public void setId( int id ){
         this.id = id;
     }

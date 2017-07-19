@@ -1,8 +1,9 @@
-package com.coolweather.android.util;
+package com.coolweather.android;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import com.coolweather.android.R;
 import com.coolweather.android.db.City;
 import com.coolweather.android.db.Country;
 import com.coolweather.android.db.Province;
+import com.coolweather.android.util.HttpUtil;
+import com.coolweather.android.util.Utility;
 
 import org.litepal.crud.DataSupport;
 
@@ -80,6 +83,7 @@ public class ChooseAreaFragment extends Fragment {
         View view = inflater.inflate( R.layout.choose_area, container, false );
         titleText = ( TextView )view.findViewById( R.id.title_text );
         backButton = ( Button )view.findViewById( R.id.back_button );
+        listView = ( ListView )view.findViewById( R.id.list_view );
         adapter = new ArrayAdapter<>( getContext(), android.R.layout.simple_list_item_1, dataList );
         listView.setAdapter( adapter );
         return view;
@@ -120,7 +124,7 @@ public class ChooseAreaFragment extends Fragment {
      */
     private void queryProvince(){
         titleText.setText( "中国" );
-        backButton.setVisibility( listView.GONE );
+        backButton.setVisibility( View.GONE );
         provinceList = DataSupport.findAll( Province.class );
         if( provinceList.size() > 0 ){
             dataList.clear();
@@ -180,7 +184,7 @@ public class ChooseAreaFragment extends Fragment {
         else{
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china" + provinceCode + "/" + cityCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
             queryFromServer( address, "country" );
         }
     }
@@ -198,13 +202,15 @@ public class ChooseAreaFragment extends Fragment {
                 if( "province".equals( type ) ){
                     result = Utility.handleProvinceResponse( responseText );
                 }
-                else if( "City".equals( "type" ) ){
+                else if( "city".equals( type ) ){
                     result = Utility.handleCityResponse( responseText, selectedProvince.getId() );
+//                    Log.d( "Message", Integer.toString( selectedProvince.getId() ) );
                 }
-                else if( "Country".equals( type ) ){
+                else if( "country".equals( type ) ){
                     result = Utility.handleCountryResponse( responseText, selectedCity.getId() );
                 }
                 if( result ){
+//                    Log.d( "Message", "I am here check" );
                     getActivity().runOnUiThread( new Runnable(){
                         @Override
                         public void run(){
